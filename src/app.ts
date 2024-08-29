@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express'
 import { carRoutes } from './modules/car/car.route';
 import { bookingRoutes } from './modules/booking/booking.route';
+import notFound from './middleware/notFound';
 
 const app: Application = express();
 
@@ -14,6 +15,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("hello!");
 });
 
-
+app.use(notFound)
 
 export default app;

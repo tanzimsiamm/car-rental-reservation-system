@@ -28,7 +28,8 @@ const updateCarById = async (id: string, updateData: Partial<TCar>) =>{
 const deleteCarById = async(id: string) =>{
   const result = await Car.findByIdAndDelete(id);
   return result;
-}
+};
+
 
 export const carServices = {
   createCar,

@@ -7,4 +7,9 @@ export type TCar = {
     features: string[];
     pricePerHour: number;
     isDeleted: boolean;
+};
+
+export type TReturnCar = {
+    bookingId : string;
+    endTime : string;
 }
