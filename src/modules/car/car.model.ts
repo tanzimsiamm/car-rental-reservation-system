@@ -14,4 +14,5 @@ const carSchema = new Schema<TCar>({
     timestamps: true
   });
 
+
   export const Car = model<TCar>('Car', carSchema);
