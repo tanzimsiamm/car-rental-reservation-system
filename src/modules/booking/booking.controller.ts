@@ -1,53 +1,50 @@
+import httpStatus from 'http-status';
+import sendResponse from '../../utils/sendResponse';
 import { bookingServices } from './booking.service';
-import { Request, Response } from 'express';
+import catchAsync from '../../utils/catchAsync';
 
- const createBooking = async (req: Request, res: Response): Promise<void> => {
-  try {
-    console.log(req.body)
-    const newBooking = await bookingServices.createBooking(req.body);
-    res.status(200).json({
-      success: true,
-      statusCode: 200,
-      message: 'Bookings retrieved successfully',
-      data: newBooking
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings', error });
-  }
-};
+const createBooking = catchAsync (async (req, res) => {
+  // get user email from token decoded data 
+  const userEmail = req?.user?.email;
 
- const getAllBookings = async (req: Request, res: Response) => {
-  try {
-    const { carId, date } = req.query;
-    const bookings = await bookingServices.getAllBookings();
-    res.status(200).json({
-      success: true,
-      statusCode: 200,
-      message: 'Bookings retrieved successfully',
-      data: bookings
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings', error });
-  }
-};
+ const result = await bookingServices.createBooking(userEmail , req.body);
+ 
+ sendResponse(res, {
+  statusCode: httpStatus.OK,
+  success: true,
+  message: 'Car booked successfully',
+  data: result,
+})
+});
 
- const updateBooking = async (req: Request, res: Response) => {
-  try {
-    const { bookingId } = req.params;
-    const { endTime, totalCost } = req.body;
-    const updatedBooking = await bookingServices.updateBooking(bookingId, endTime, totalCost);
-    res.status(200).json({
-      success: true,
-      statusCode: 200,
-      message: 'Bookings retrieved successfully',
-      data: updatedBooking
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings', error });
-  }
-};
+const getAllBookings = catchAsync (async (req, res) => {
+  const result = await bookingServices.getAllBookings(req.query);
+  
+  sendResponse(res, {
+   statusCode: httpStatus.OK,
+   success: true,
+   message: 'Bookings retrieved successfully',
+   data: result,
+ })
+});
+
+const getUserBookings = catchAsync (async (req, res) => {
+  // get user email from token decoded data 
+  const userEmail = req?.user?.email;
+
+   const result = await bookingServices.getUserBookings(userEmail);
+   
+   sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'My Bookings retrieved successfully',
+    data: result,
+  });
+})
+
+
 export const bookingControllers = {
   createBooking,
     getAllBookings,
-    updateBooking
+    getUserBookings
 }

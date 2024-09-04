@@ -1,10 +1,14 @@
-import { Schema } from "mongoose";
-
 export type TBooking = {
-    date: string;
-    user: Schema.Types.ObjectId;
-    car: Schema.Types.ObjectId;
-    startTime: string;
-    endTime: string | null;
-    totalCost: number;
-  }
+  date : string;
+  user : object;
+  car : object;
+  startTime : string;
+  endTime : string;
+  totalCost : number;
+}
+
+export type TCreateBooking = {
+  carId : string,
+  date : string,
+  startTime : string,
+}

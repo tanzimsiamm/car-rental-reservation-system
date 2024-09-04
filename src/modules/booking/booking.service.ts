@@ -1,39 +1,59 @@
 import mongoose from 'mongoose';
-import { Car } from '../car/car.model';
-import { TBooking } from './booking.interface';
 import { Booking } from './booking.model';
+import { User } from '../users/user.model';
+import { Car } from '../car/car.model';
+import httpStatus from 'http-status';
+import AppError from '../../errors/AppError';
+import { TCreateBooking } from './booking.interface';
 
-const createBooking = async (bookingData: TBooking): Promise<TBooking> => {
-  const carId = new mongoose.Types.ObjectId(bookingData.car);
-  const userId = new mongoose.Types.ObjectId(bookingData.user);
-  const car = await Car.findById(bookingData.car)
-  if (!car) {
-    throw new Error('Car is not available');
-}
+const createBooking = async (userEmail: string, payload : TCreateBooking ) => {
+  // get userData by email 
+  const userData = await User.findOne({ email: userEmail}, { createdAt : 0, updatedAt : 0, password: 0, __v : 0})
+ 
+     // update the car status available to unavailable 
+  const carData =  await Car.findByIdAndUpdate(payload.carId, { status: 'unavailable'}, { new: true })
 
-  // Create booking
-  const booking = new Booking({
-    ...bookingData,
-    car: carId,
-    user: userId
-  });
-  await booking.save();
+  if(!userData){
+      throw new AppError(httpStatus.NOT_FOUND, 'user is not exist')
+  }
 
-  return booking;
+  if(!carData){
+      throw new AppError(httpStatus.NOT_FOUND, 'car is not exist')
+  }
+
+  if(carData.isDeleted === true ){
+      throw new AppError(httpStatus.NOT_FOUND, 'car is not found')
+  }
+
+
+  const bookingData: Record<string, unknown> = {...payload}
+  bookingData.user = userData;
+  bookingData.car = carData;
+
+  const result = await Booking.create(bookingData);
+  return result;
 };
 
-const getAllBookings = async () => {
-  const bookings = await Booking.find().populate('user').populate('car');
-  return bookings;
+
+const getAllBookings = async (query : Record<string, unknown>) => {
+  const queryObj : Record<string, unknown> = {}
+
+   if(query?.carId && query?.date){
+       queryObj['car._id']  = new mongoose.Types.ObjectId(query.carId as string)
+       queryObj.date = query.date;
+   }
+ 
+ const result = await Booking.find(queryObj);
+ return result;
 };
 
- const updateBooking = async (bookingId: string, endTime: string, totalCost: number) => {
-  const result = await Booking.findByIdAndUpdate(bookingId, { endTime, totalCost }, { new: true });
+ const getUserBookings = async (userEmail: string) => {
+  const result = await Booking.find({ 'user.email' : userEmail});
   return result;
 };
 
 export const bookingServices = {
   createBooking,
   getAllBookings,
-  updateBooking
+  getUserBookings
 }
