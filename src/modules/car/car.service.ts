@@ -23,7 +23,7 @@ const updateCarById = async (id: string , payload: Partial<TCar>) => {
 }
 
 const deleteCarById = async ( id: string) => {
-  const result = await Car.findByIdAndUpdate(id, { isDeleted: true } ,{new: true });
+  const result = await Car.findByIdAndDelete(id, { isDeleted: true } );
   return result;
 }
 

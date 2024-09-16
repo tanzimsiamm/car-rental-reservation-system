@@ -4,20 +4,18 @@ import AppError from "../errors/AppError";
 import httpStatus from "http-status";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from "../config";
-import { TuserRole } from "../modules/users/user.interface";
 
 
-
-const auth =(...requiredRoles: TuserRole[]) => {
+const auth =(...requiredRoles: string[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers.authorization
-        console.log(token)
+        // console.log(token)
         // if the token is sent from the client
         if(!token){
             throw new AppError(httpStatus.UNAUTHORIZED, 'you are not authorized')
         }
         // check if the token is valid
-        jwt.verify(token, config.jwt_access_secret as string, function(err, decoded) {
+        jwt.verify(token.split(' ')[1], config.jwt_access_secret as string, function(err, decoded) {
             // err
             if(err){
                 throw new AppError(httpStatus.UNAUTHORIZED, 'you are not authorized')

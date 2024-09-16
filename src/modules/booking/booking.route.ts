@@ -6,10 +6,17 @@ import { createBookingValidationSchema } from './booking.validation';
 
 const router = Router();
 
-router.get('/', auth('admin') , bookingControllers.getAllBookings );
+router.get('/',
+    auth('admin') ,
+    bookingControllers.getAllBookings);
 
-router.get('/my-bookings', auth('user') , bookingControllers.getUserBookings );
+router.get('/my-bookings',
+    auth('user') ,
+    bookingControllers.getUserBookings);
 
-router.post('/', validateRequest(createBookingValidationSchema), auth('user') , bookingControllers.createBooking )
+router.post('/',
+    auth('user') ,
+    validateRequest(createBookingValidationSchema),
+    bookingControllers.createBooking)
 
 export const bookingRoutes = router;
