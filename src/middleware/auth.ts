@@ -4,33 +4,33 @@ import AppError from "../errors/AppError";
 import httpStatus from "http-status";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from "../config";
+import { User } from "../modules/users/user.model";
 
 
-const auth =(...requiredRoles: string[]) => {
+const auth = (...requiredRoles: string[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers.authorization
         // console.log(token)
         // if the token is sent from the client
-        if(!token){
+        if (!token) {
             throw new AppError(httpStatus.UNAUTHORIZED, 'you are not authorized')
         }
         // check if the token is valid
-        jwt.verify(token.split(' ')[1], config.jwt_access_secret as string, function(err, decoded) {
-            // err
-            if(err){
-                throw new AppError(httpStatus.UNAUTHORIZED, 'you are not authorized')
-            }
-            // decoded undefined
-            // const {email, role} = decoded
-            const role = (decoded as JwtPayload).role
+        const decoded = jwt.verify(token.split(' ')[1], config.jwt_access_secret as string) ;
+        const { role, email } = decoded as JwtPayload;
 
-            if(requiredRoles && !requiredRoles.includes(role)){
-                throw new AppError(httpStatus.UNAUTHORIZED, 'you are not authorized')
-            }
+        const user = await User.find({ email, role });
+    
+        if (!user) {
+          throw new AppError(401, "User not found");
+        };
 
+        if (!requiredRoles.includes(role)) {
+          throw new AppError(401, "You are not authorized to access this route");
+        };
             req.user = decoded as JwtPayload
             next()
-          });
-  })
-  };
+        });
+    };
+    
 export default auth;
