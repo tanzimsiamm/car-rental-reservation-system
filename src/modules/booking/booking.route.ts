@@ -7,16 +7,17 @@ import { createBookingValidationSchema } from './booking.validation';
 const router = Router();
 
 router.get('/',
-    auth('admin') ,
+    auth('admin'),
     bookingControllers.getAllBookings);
 
-router.get('/my-bookings',
-    auth('user') ,
-    bookingControllers.getUserBookings);
 
 router.post('/',
-    auth('user') ,
+    auth('user'),
     validateRequest(createBookingValidationSchema),
     bookingControllers.createBooking)
+
+router.get('/my-bookings',
+    auth('user'),
+    bookingControllers.getUserBookings);
 
 export const bookingRoutes = router;
