@@ -1,5 +1,6 @@
+import { SortOrder } from "mongoose";
 import { Booking } from "../booking/booking.model";
-import { TCar, TReturnCar } from "./car.interface"
+import { TCar, TCarsQuery, TReturnCar } from "./car.interface"
 import { Car } from "./car.model"
 
 const createCar = async( payload: TCar) =>{
@@ -7,10 +8,54 @@ const createCar = async( payload: TCar) =>{
   return result;
 };
 
-const getAllCars = async() =>{
-  const result = await Car.find();
-  return result
+const getAllCars = async (query: TCarsQuery) => {
+  const filter : Record<string ,unknown> = { isDeleted : false};
+
+  //  {
+          // location : 'tangail'
+          // carType : 'sedun'
+          // costRange : '10-35'
+          // sortByCost : -1
+          // status : 'unavailable'
+  //  }
+
+// Add search value to filter if provided
+if (query.location) {
+filter.$or = [
+  { location: { $regex: query.location, $options: 'i' } },
+];
+}
+
+// Add carType to filter if provided
+if (query.carType) {
+filter.carType = query.carType;
+}
+
+// Add status to filter if provided
+if (query.status) {
+filter.status = query.status;
+}
+
+// Add pricePerHour to filter if provided
+if (query.costRange) {
+const [startingCost, endingCost] = query.costRange.split('-').map(Number);
+filter.pricePerHour = { $gte: startingCost, $lte: endingCost };
+//   console.log(filter)
+}
+
+// Set sort option based on sortByPrice if provided
+const sortOption : {
+ pricePerHour?: SortOrder;
+} = {};
+
+if (query.sortByCost) {
+sortOption.pricePerHour = Number(query.sortByCost) as SortOrder;
+}
+
+const cars = await Car.find(filter).sort(sortOption);
+return cars;
 };
+
 
 const getCarById = async(id : string) =>{
   const result = await Car.findById(id);
@@ -29,18 +74,23 @@ const deleteCarById = async ( id: string) => {
 
 const returnCar = async (payload : TReturnCar) => {
   // get the booking by id 
-  const booking = await Booking.findById(payload.bookingId)
+  const booking  = await Booking.findById(payload.bookingId)
   
   // calculating totalCost 
   const startTime = booking?.startTime;
-  const endTime = payload?.endTime;
+  const endTime = booking?.endTime;
 
-  let date1: any = new Date(`1970-01-01T${startTime}:00Z`);
-  let date2 : any = new Date(`1970-01-01T${endTime}:00Z`);
+  const date1: any = new Date(`1970-01-01T${startTime}:00Z`);
+  const date2 : any = new Date(`1970-01-01T${endTime}:00Z`);
 
-  let differenceMilliseconds = date2 - date1;
-  let diffHours = differenceMilliseconds / (1000 * 60 * 60);
-  const totalCost = diffHours * booking?.car?.pricePerHour;
+  const differenceMilliseconds = date2 - date1;
+  const diffHours = differenceMilliseconds / (1000 * 60 * 60);
+  let totalCost : number;
+  if(booking?.car.pricePerHour){
+    totalCost = diffHours * booking.car.pricePerHour
+  }else{
+    totalCost = 0;
+  }
 
       // update the car status 
       const carId = booking?.car?._id;
@@ -48,7 +98,10 @@ const returnCar = async (payload : TReturnCar) => {
 
   // update the booking 
  const result =  await Booking.findByIdAndUpdate(payload.bookingId, { 
-      endTime, totalCost , 'car.status': 'available'
+  totalCost : totalCost, 
+  'car.status': 'available',
+   status : 'completed',
+    isReturnProcess: false
   }, { new : true })
 
 return result;

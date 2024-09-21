@@ -10,7 +10,6 @@ router.get('/',
     auth('admin'),
     bookingControllers.getAllBookings);
 
-
 router.post('/',
     auth('user'),
     validateRequest(createBookingValidationSchema),
@@ -19,5 +18,21 @@ router.post('/',
 router.get('/my-bookings',
     auth('user'),
     bookingControllers.getUserBookings);
+
+router.patch('/cancel',
+    auth('admin'),
+    bookingControllers.cancelBooking);
+
+router.get('/statistics',
+    auth('admin'),
+    bookingControllers.getStatistics);
+
+router.get('/:productId',
+    auth('user', 'admin'),
+    bookingControllers.getSingleBooking);
+
+router.put('/:productId',
+    auth('user', 'admin'),
+    bookingControllers.updateBooking);
 
 export const bookingRoutes = router;
