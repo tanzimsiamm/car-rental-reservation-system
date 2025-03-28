@@ -6,7 +6,7 @@ import { userControllers } from './userController';
 const router = express.Router();
 
 
-// get 
+// get /api/users
 router.get('/', auth('admin'),  userControllers.getAllUsers)
 router.get('/:email', auth('admin','user'), userControllers.getSingleUser)
 

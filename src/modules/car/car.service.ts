@@ -8,16 +8,17 @@ const createCar = async( payload: TCar) =>{
   return result;
 };
 
+
 const getAllCars = async (query: TCarsQuery) => {
   const filter : Record<string ,unknown> = { isDeleted : false};
 
-  //  {
-          // location : 'tangail'
-          // carType : 'sedun'
-          // costRange : '10-35'
-          // sortByCost : -1
-          // status : 'unavailable'
-  //  }
+   {
+          location : 'tangail'
+          carType : 'sedun'
+          costRange : '10-35'
+          sortByCost : -1
+          status : 'unavailable'
+   }
 
 // Add search value to filter if provided
 if (query.location) {

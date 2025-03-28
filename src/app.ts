@@ -6,11 +6,15 @@ import globalErrorHandler from './middleware/globalErrorHandler';
 import { authRoutes } from './modules/auth/auth.route';
 import { userRoutes } from './modules/users/user.routes';
 import { paymentRoutes } from './modules/payment/payment.routes';
+import cors from 'cors'
 
 const app: Application = express();
 
 // parsers
 app.use(express.json());
+
+//cors
+app.use(cors( {origin: "*"}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/cars", carRoutes);
