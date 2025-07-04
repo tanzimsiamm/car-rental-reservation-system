@@ -20,7 +20,7 @@ router.get('/my-bookings',
     bookingControllers.getUserBookings);
 
 router.patch('/cancel',
-    auth('admin'),
+    auth('user'),
     bookingControllers.cancelBooking);
 
 router.get('/statistics',
