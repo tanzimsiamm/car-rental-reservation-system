@@ -68,14 +68,23 @@ const deleteCar = catchAsync (async (req, res) => {
 
   const returnCar = catchAsync (async (req, res) => {
     const result = await carServices.returnCar(req.body);
-    
-    sendResponse(res, {
-     statusCode: httpStatus.OK,
-     success: true,
-     message: 'Car returned successfully',
-     data: result,
-   });
- })
+
+  if (!result) {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Failed to return car. Invalid data or time range.",
+      data: null,
+    });
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Car returned successfully",
+    data: result,
+  });
+});
 
 export const carControllers = {
   createCar,

@@ -103,6 +103,7 @@ const updateBooking = async (bookingId: string, payload: Partial<TBooking>) => {
   return result;
 };
 
+
 const cancelBooking = async (payload: { bookingId: string; carId: string }) => {
   const result = await Booking.findByIdAndUpdate(payload.bookingId, {
     status: "cancelled",

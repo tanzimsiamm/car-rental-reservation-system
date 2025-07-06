@@ -15,7 +15,8 @@ export type TCar = {
 
 
 export type TReturnCar = {
-    bookingId : string;
+  bookingId: string;
+  endTime?: string;
 };
 
 export type TCarsQuery = {
