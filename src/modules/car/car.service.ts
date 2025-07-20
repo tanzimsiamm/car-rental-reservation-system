@@ -72,7 +72,9 @@ const deleteCarById = async (id: string) => {
 };
 
 export const returnCar = async (payload: TReturnCar) => {
-  const booking = await Booking.findById(payload.bookingId).populate<{ car: TCar }>("car");
+  const booking = await Booking.findById(payload.bookingId).populate<{
+    car: TCar;
+  }>("car");
 
   if (!booking) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid booking ID");

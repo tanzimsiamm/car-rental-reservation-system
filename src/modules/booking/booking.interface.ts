@@ -2,8 +2,8 @@ import { Types } from "mongoose"; // Import Types
 
 export type TBooking = {
   date: string;
-  user: Types.ObjectId; // Change from object to Types.ObjectId for ref
-  car: Types.ObjectId; // Change from TCar to Types.ObjectId for ref
+  user: Types.ObjectId; 
+  car: Types.ObjectId; 
   phone: string;
   location: string;
   paymentMethod: string;

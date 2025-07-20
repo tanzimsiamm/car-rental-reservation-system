@@ -57,13 +57,23 @@ const getAllBookings = async (query: Record<string, unknown>) => {
   const queryObj: Record<string, unknown> = {};
 
   if (query?.carId && query?.date) {
-    queryObj["car._id"] = new mongoose.Types.ObjectId(query.carId as string);
+    queryObj["car"] = new mongoose.Types.ObjectId(query.carId as string);
     queryObj.date = query.date;
   }
 
-  const result = await Booking.find(queryObj);
+  const result = await Booking.find(queryObj)
+    .populate({
+      path: "car",
+      select: "name images pricePerHour", 
+    })
+    .populate({
+      path: "user",
+      select: "email", 
+    });
+
   return result;
 };
+
 
 const getStatistics = async () => {
   // Count total bookings
